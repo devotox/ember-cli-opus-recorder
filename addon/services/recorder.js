@@ -74,7 +74,7 @@ export default Service.extend({
 
 	async createNewRecorder() {
 		let encoderPath = this.encoderPath;
-		let recorder = new Recorder({ encoderPath, ...this.recorderOptions });
+		let recorder = new Recorder(Object.assign({ encoderPath }, this.recorderOptions));
 
 		recorder.ondataavailable = (typedArray) => {
 			this.recorderData = new Blob([typedArray], { 
