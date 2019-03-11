@@ -1,8 +1,8 @@
 import Recorder from 'opus-recorder';
 
-import Service from '@ember/service';
-
 import { later, cancel } from '@ember/runloop';
+
+import Service, { inject } from '@ember/service';
 
 const {
 	URL,
@@ -40,6 +40,8 @@ function delayPromise(timeout) {
 
 export default Service.extend({
 
+	router: inject(),
+
 	recorder: null,
 
 	isRecording: false,
@@ -73,7 +75,8 @@ export default Service.extend({
 	},
 
 	async createNewRecorder() {
-		let encoderPath = this.encoderPath;
+		let rootURL = this.get('router').rootURL;
+		let encoderPath = `${rootURL}${this.encoderPath}`;
 		let recorder = new Recorder(Object.assign({ encoderPath }, this.recorderOptions));
 
 		recorder.ondataavailable = (typedArray) => {
