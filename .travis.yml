@@ -17,7 +17,8 @@ cache:
 env:
   global:
     # See https://git.io/vdao3 for details.
-    - JOBS=1
+    JOBS: 1
+    secure: fOTO/HpUT0xsfml9iXuEL9qBu0NVErcig6CmrS1DFv7f4x9/mYQMNzLUv5b6VBPqGHeFNHiGaUUza3Ufc5KpL7DOu/1y6TFQlSoM6MRRdIXb+50MObvkJ4wXwYJH7Zrb4g8RTaBOY9uU5XQkm/E6GWWF3NiYFoVzCYPNSgAALko1caoEX2hoJNXJSd0T4G+gxtxc2g08RGunBPLqIyy2avMRN4yq0WDN2NbBrztM01FA5RoOLPyX0hhzyIZ+45z34wKvZtu7rj9h1KbFOZOVFJWpHDa0bXxhF63ldxPINe2QMOSsOD22Czk1+IKyC+88gtkvUq7pGUaJK6YdVDRcW9G/DMHVy/IE2aFabrPDVgzrmeCoVKzATzt8nMfIMTTu9Unoa5fdohpJ0NPhYnPfVAGfJ+2MPITgP+x2X6M5+KgHCBdaIgwBVnZE9DTb1L9c/Eh50zeHHbfv9L+NVlbQFzMWNj+kKWMj0qwh6JPpSFiKaOvTK6XP+NSUc7euAZgqK6lwqS07pvcql4qvzbeRWyn/GZuRHOGvfkUNuvLee8dMKfpF3s1VQ6blHHqKB8qH2ifxawiztWgUkYxK0GFTk//ZopLzP90bLl0JiGlg517tp5V9eBOK5ZlPwsSOhD+wta9gCssPjK4i2H2IwLox7AqXegigBMdqIbXz9LaFVAY=
 
 branches:
   only:
@@ -40,11 +41,12 @@ jobs:
       script:
         - yarn lint:hbs
         - yarn lint:js
-        - yarn test
+        - COVERAGE=true yarn test
+        - codecov
 
-    - name: "Floating Dependencies"
-      script:
-        - yarn test
+    # - name: "Floating Dependencies"
+    #   script:
+    #     - yarn test
 
     # we recommend new addons test the current and previous LTS
     # as well as latest stable release (bonus points to beta/canary)
@@ -59,9 +61,34 @@ jobs:
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash
   - export PATH=$HOME/.yarn/bin:$PATH
+  - yarn global add greenkeeper-lockfile@1
+  - yarn global add codecov
 
 install:
   - yarn install --no-lockfile --non-interactive
 
 script:
   - node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
+
+notifications:
+  webhooks:
+    urls:
+    - https://webhook.atomist.com/travis
+    on_success: always
+    on_failure: always
+    on_start: always
+    on_cancel: always
+    on_error: always
+  slack:
+    rooms:
+      secure: La7/bewRzz9QEc4gKiv5CnhKM8uEpSOZM6MtHCd1qkokd1v0J/Prhqnt/k/3ib3k62lmd+ytuJunFGvpZTeyC4+1ogvK/gfNkZAG1vzoiqP9FKUul1noPKkJxhGAUskYHHI+fTIZoKkECPTMR7e/vuB4mdnjwoy3b9vs+EDbTKXzXkXP+q5Z94YzQ5XeVgshoRXW6zLJ5DM8eQphaYYmlcWPpqRIMqz/Ryc+b4dV9MO2m6MOsZuOWaf3xZ3o7a+JPeutFKdT2U9T9FR2UpsY+HtLx2cKACEy6cPSexopRwVwLJbddTzZEB8UGhjZdSxS1P3/NwD9RbbRdvFbkXgD6q0tNvmDThkprFtZUVN5eohzL/Yt74P6+HMutjiNc3x/M5bA9htSDIEuh3kW/hR3aA0yhc7+oq/NEhApZvpK1NthhGNEEOcX5ETzCXbAHVsitpDfW+r/y7/ib6WLhRLPTTzpZN2qdOCnN/TEk015yFiZd5vrfkR127lVun4X1vAVWiytkIA0eC9HmXjFrLMJDcql6aDCWGEH52tkaWuRWffdM399XuKF9ya4KdSHUEWvhlh3OEJbpCa2eNjjPuXSWQZ9HM9O1sH8yAsqZ7OXVJsAT2Wp/r7lvwKjyk8CHsjOgSgSI1V1kwx03OusG9DopYV2W0aL5nnkiV3nqFS4Hh0=
+
+deploy:
+  provider: npm
+  skip_cleanup: true
+  email: devo.tox.89@gmail.com
+  api_key:
+    secure: VCRtlo9SQA81R0dy7OAdIV94XrVQNHSzJsmRP60MdtCmbbist3w+HSAotnXaFjrcvpomipmcERFWbceYsQ92os4h9vHv0RrRgDRRMcrn6cc+2+UUJu1/42WEGm6uofGFdO9yENjY4mQUc7EDHBrTf/G2Ndme24PlStlV1mDeu1llaV/zlJpARhE57t6TrBnqcpU9i0gD9WVNMpRu9pySMYYKMWGE/jNG3pYoo9/m0Z7zQRT7uZKkkrYTTOmNgAhFgDDyBIFQvIBUctv6A0iBeIxWmbLusBBn9FmrdSKP+l2m18iZkWt23037NNcd1HkxtpVgtmdMS/dcd6jHqZ/Qq7/jeumLOW0S6IQ8R/pdxiHAfBEeL7yy8ME3/HMIo1QmOkcmE7wzx83sVEBY/+Hd1Kbj+RdNEZjA/7Uk85i2o33llpqMlJW/EZEKY8IH3oJNM1SzJNVtA2ivk9vVkQedalB15SxsZM5wETLaY1pHd+6amWgkncxStrZbWsGsEgTirbku1cKVwW70DHD/58zx0eCcF0J2CeFMBiUCk/B5SuaQaDoP3htp2raLbbzrzpStLZtOMIA5Oerdd0hiVIdkOV3b3Djd7aOcIfX4XJudgZ4VF2UjpzeDWvGoocaVmy3WqLH+hfW16VIR8N/OLuJ6IBCH/tJAD3HMuINq2CCmtjs=
+  on:
+    tags: true
+    repo: devotox/ember-cli-opus-recorder

@@ -2,14 +2,14 @@
 
 ## Installation
 
-* `git clone <repository-url>`
+* `git clone https://github.com/devotox/ember-cli-opus-recorder`
 * `cd ember-cli-opus-recorder`
 * `yarn install`
 
 ## Linting
 
-* `yarn lint:hbs`
 * `yarn lint:js`
+* `yarn lint:hbs`
 * `yarn lint:js --fix`
 
 ## Running tests
