@@ -54,7 +54,7 @@ export default Service.extend({
 
 	audioElementID: 'audio-playback',
 
-	encoderPath: '/opus-recorder/waveWorker.min.js',
+	encoderPath: 'opus-recorder/waveWorker.min.js',
 
 	init() {
 		this._super(...arguments);
