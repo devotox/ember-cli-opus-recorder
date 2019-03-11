@@ -3871,7 +3871,7 @@ function s(e){n(a,i,o,s,u,"next",e)}function u(e){n(a,i,o,s,u,"throw",e)}s(void 
 var i=window,o=i.URL,a=i.Blob,s=i.Promise,u=i.document,l=i.FileReader,c=function(e){return o.createObjectURL(e)},h=function(e){var t="data"===(arguments.length>1&&void 0!==arguments[1]?arguments[1]:"text")?"readAsDataURL":"readAsText"
 return new s(function(n,r){var i=new l
 i[t](e),i.onerror=function(e){return r(e)},i.onload=function(){return n(i.result)}})}
-function f(e){return new s(function(t){return setTimeout(t,e)})}var p=Ember.Service.extend({recorder:null,isRecording:!1,audioTimeout:null,recordingTime:5e3,recorderOptions:null,audioElementType:"audio/wav",audioElementID:"audio-playback",encoderPath:"/opus-recorder/waveWorker.min-5c4a46de01f8b5a6cbb31ab3fbb52255.js",init:function(){return this._super.apply(this,arguments),this.setup()},setup:function(){var e=r(regeneratorRuntime.mark(function e(){var t
+function f(e){return new s(function(t){return setTimeout(t,e)})}var p=Ember.Service.extend({recorder:null,isRecording:!1,audioTimeout:null,recordingTime:5e3,recorderOptions:null,audioElementType:"audio/wav",audioElementID:"audio-playback",encoderPath:"/opus-recorder/waveWorker.min.js",init:function(){return this._super.apply(this,arguments),this.setup()},setup:function(){var e=r(regeneratorRuntime.mark(function e(){var t
 return regeneratorRuntime.wrap(function(e){for(;;)switch(e.prev=e.next){case 0:if(e.t0=this.get("recorder"),e.t0){e.next=5
 break}return e.next=4,this.createNewRecorder()
 case 4:e.t0=e.sent
