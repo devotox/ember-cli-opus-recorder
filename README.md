@@ -10,8 +10,11 @@
 ember-cli-opus-recorder
 ==============================================================================
 
-Simple Wrapper around [Recorder JS](https://github.com/mattdiamond/opus-recorder).
-This provides a service that can be used to record / play audio and export do audio as a wav file / blob / base64
+Simple Wrapper around [Opus Recorder](https://github.com/chris-rudmin/opus-recorder).
+
+This provides a service that can be used to record, play, and export audio as a wav file, blob, or bas64 string.
+
+[DEMO](http://devotox.github.io/ember-cli-opus-recorder)
 
 Installation
 ------------------------------------------------------------------------------
