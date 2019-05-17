@@ -3,8 +3,8 @@
 [![Coverage Status](https://codecov.io/gh/devotox/ember-cli-opus-recorder/branch/master/graph/badge.svg)](https://codecov.io/gh/devotox/ember-cli-opus-recorder)
 [![NPM Version](https://badge.fury.io/js/ember-cli-opus-recorder.svg)](http://badge.fury.io/js/ember-cli-opus-recorder)
 [![NPM Downloads](https://img.shields.io/npm/dm/ember-cli-opus-recorder.svg)](https://www.npmjs.org/package/ember-cli-opus-recorder)
-[![Dependency Status](https://david-dm.org/poetic/ember-cli-opus-recorder.svg)](https://david-dm.org/poetic/ember-cli-opus-recorder)
-[![DevDependency Status](https://david-dm.org/poetic/ember-cli-opus-recorder/dev-status.svg)](https://david-dm.org/poetic/ember-cli-opus-recorder#info=devDependencies)
+[![Dependency Status](https://david-dm.org/devotox/ember-cli-opus-recorder.svg)](https://david-dm.org/devotox/ember-cli-opus-recorder)
+[![DevDependency Status](https://david-dm.org/devotox/ember-cli-opus-recorder/dev-status.svg)](https://david-dm.org/devotox/ember-cli-opus-recorder#info=devDependencies)
 [![Greenkeeper](https://badges.greenkeeper.io/devotox/ember-cli-opus-recorder.svg)](https://greenkeeper.io/)
 
 ember-cli-opus-recorder
@@ -14,7 +14,7 @@ Simple Wrapper around [Opus Recorder](https://github.com/chris-rudmin/opus-recor
 
 This provides a service that can be used to record, play, and export audio as a wav file, blob, or bas64 string.
 
-[DEMO](http://devotox.github.io/ember-cli-opus-recorder)
+[DEMO](https://devotox.github.io/ember-cli-opus-recorder)
 
 Installation
 ------------------------------------------------------------------------------
