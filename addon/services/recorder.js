@@ -12,7 +12,6 @@ const {
 	FileReader,
 } = window;
 
-
 const crypto = {
 	createURL(blob) {
 		return URL.createObjectURL(blob);
@@ -125,10 +124,11 @@ export default Service.extend({
 			});
 	},
 
-	async play() {
+	async play(audio) {
 		this.removeAudioElement();
+		let recordingTime = this.get('recordingTime');
 
-		let { audioURL } = await this.getAudio();
+		let { audioURL } = audio || await this.getAudio();
 
 		let $audio = document.createElement('audio');
 		let $source = document.createElement('source');
@@ -142,6 +142,16 @@ export default Service.extend({
 
 		$audio.appendChild($source);
 		document.body.appendChild($audio);
+
+		return recordingTime
+			&& new Promise((resolve, reject) => {
+				let finish = () => resolve(this.stop());
+				let audioTimeout = later(finish, recordingTime);
+
+				this.set('audioTimeout', audioTimeout);
+				this.set('resolvePromise', resolve);
+				this.set('rejectPromise', reject);
+			});
 	},
 
 	async reset() {
