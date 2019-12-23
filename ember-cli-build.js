@@ -6,7 +6,7 @@ module.exports = function(defaults) {
   let app = new EmberAddon(defaults, {
     // Add options here
     fingerprint: {
-      exclude: ['*waveWorker.min.js', '*encoderWorker.min.js']
+      exclude: ['*waveWorker.min.js', '*encoderWorker.min.*']
     }
   });
 
