@@ -11,7 +11,7 @@ module.exports = {
         public: {
           srcDir: 'dist',
           destDir: 'opus-recorder',
-          include: ['waveWorker.min.js', 'encodeWorker.min.js'],
+          include: ['waveWorker.min.js', 'encoderWorker.min.js'],
           processTree(input) {
             return FastbootTransform(input);
           }
