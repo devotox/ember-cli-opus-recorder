@@ -10,6 +10,6 @@
 </div>
 <br>
 
-<button {{action "record"}}>Record</button>
-<button {{action "play"}}>Play</button>
-<button {{action "stop"}}>Stop</button>
+<button type="button" {{on "click" (fn (route-action "record"))}}>Record</button>
+<button type="button" {{on "click" (fn (route-action "play"))}}>Play</button>
+<button type="button" {{on "click" (fn (route-action "stop"))}}>Stop</button>

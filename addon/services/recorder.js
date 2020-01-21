@@ -1,15 +1,17 @@
 import Recorder from 'opus-recorder';
 
+import { tracked } from '@glimmer/tracking';
+
 import { later, cancel } from '@ember/runloop';
 
-import Service, { inject } from '@ember/service';
+import Service, { inject as service } from '@ember/service';
 
 const {
 	URL,
 	Blob,
 	Promise,
 	document,
-	FileReader,
+	FileReader
 } = window;
 
 const crypto = {
@@ -17,10 +19,10 @@ const crypto = {
 		return URL.createObjectURL(blob);
 	},
 	fromBlob(blob, type = 'text') {
-		let func = type === 'data' ? 'readAsDataURL' : 'readAsText';
+		const func = type === 'data' ? 'readAsDataURL' : 'readAsText';
 
 		return new Promise((resolve, reject) => {
-			let reader = new FileReader();
+			const reader = new FileReader();
 
 			reader[func](blob);
 			reader.onerror = (error) => reject(error);
@@ -28,7 +30,7 @@ const crypto = {
 		});
 	},
 	toBlob(dataURI) {
-		let { buffer, mimeString } = this.toArrayBuffer(dataURI);
+		const { buffer, mimeString } = this.toArrayBuffer(dataURI);
 		return new Blob([buffer], { type: mimeString });
 	}
 };
@@ -37,46 +39,57 @@ function delayPromise(timeout) {
 	return new Promise((resolve) => setTimeout(resolve, timeout));
 }
 
-export default Service.extend({
+export default class RecorderService extends Service {
+	@service router;
 
-	router: inject(),
+	@tracked
+	recorder;
 
-	recorder: null,
+	@tracked
+	audioTimeout;
 
-	isRecording: false,
+	@tracked
+	resolvePromise;
 
-	audioTimeout: null,
+	@tracked
+	rejectPromise;
 
-	recordingTime: 5000,
+	@tracked
+	recorderOptions = {};
 
-	recorderOptions: null,
+	@tracked
+	recordingTime = 5000;
 
-	audioElementType: 'audio/wav',
+	@tracked
+	numberOfChannels = 1;
 
-	audioElementID: 'audio-playback',
+	@tracked
+	audioElementType ='audio/wav';
 
-	encoderPath: 'opus-recorder/waveWorker.min.js',
+	@tracked
+	audioElementID = 'audio-playback';
 
-	init() {
-		this._super(...arguments);
-		return this.setup();
-	},
+	@tracked
+	encoderPath = 'opus-recorder/encoderWorker.min.js';
 
-	async setup() {
-		let recorder = this.get('recorder') 
-			|| await this.createNewRecorder();
+	constructor() {
+		super(...arguments);
+		this.setup();
+	}
 
-		return new Promise(async (resolve) => {	
-			recorder.loadWorker();
-			await delayPromise(0);
-			resolve(recorder);
+	setup() {
+		const recorder = this.recorder || this.createNewRecorder();
+		recorder.loadWorker();
+	}
+
+	createNewRecorder() {
+		const numberOfChannels = this.numberOfChannels;
+		const encoderPath = `${this.router.rootURL}${this.encoderPath}`;
+		const recorder = new Recorder({ 
+			encoderPath, 
+			numberOfChannels,
+			...this.recorderOptions 
 		});
-	},
-
-	async createNewRecorder() {
-		let rootURL = this.get('router').rootURL;
-		let encoderPath = `${rootURL}${this.encoderPath}`;
-		let recorder = new Recorder(Object.assign({ encoderPath }, this.recorderOptions));
 
 		recorder.ondataavailable = (typedArray) => {
 			this.recorderData = new Blob([typedArray], { 
@@ -84,54 +97,51 @@ export default Service.extend({
 			});
 		}
 
-		this.set('recorder', recorder);
+		this.recorder = recorder;
 		return recorder;
-	},
+	}
 
 	async stop() {
-		if(!this.get('isRecording')) { return; }
+		if(!this.isRecording) { return; }
 
-		let audioTimeout = this.get('audioTimeout');
-		let resolvePromise = this.get('resolvePromise');
+		const audioTimeout = this.audioTimeout;
+		const resolvePromise = this.resolvePromise;
 
 		resolvePromise && resolvePromise();
 		audioTimeout && cancel(audioTimeout);
 
 		this.resetRecorder();
-	},
+	}
 
 	async start() {
-		try {
-			await this.reset();
-			await this.setup();
-		} catch(e) {
-			throw e;
-		}
+		await this.reset();
+		await this.setup();
 
-		let recordingTime = this.get('recordingTime');
-		let recorder = this.get('recorder');
-		this.set('isRecording', true);
+		const recorder = this.recorder;
+		const recordingTime = this.recordingTime;
+
+		this.isRecording = true;
 		recorder.start();
 
 		return recordingTime
 			&& new Promise((resolve, reject) => {
-				let finish = () => resolve(this.stop());
-				let audioTimeout = later(finish, recordingTime);
+				const finish = () => resolve(this.stop());
+				const audioTimeout = later(finish, recordingTime);
 
 				this.set('audioTimeout', audioTimeout);
 				this.set('resolvePromise', resolve);
 				this.set('rejectPromise', reject);
 			});
-	},
+	}
 
 	async play(audio) {
 		this.removeAudioElement();
-		let recordingTime = this.get('recordingTime');
+		const recordingTime = this.recordingTime;
 
-		let { audioURL } = audio || await this.getAudio();
+		const { audioURL } = audio || await this.getAudio();
 
-		let $audio = document.createElement('audio');
-		let $source = document.createElement('source');
+		const $audio = document.createElement('audio');
+		const $source = document.createElement('source');
 
 		$source.src = audioURL;
 		$source.type = this.audioElementType;
@@ -145,45 +155,45 @@ export default Service.extend({
 
 		return recordingTime
 			&& new Promise((resolve, reject) => {
-				let finish = () => resolve(this.stop());
-				let audioTimeout = later(finish, recordingTime);
+				const finish = () => resolve(this.stop());
+				const audioTimeout = later(finish, recordingTime);
 
 				this.set('audioTimeout', audioTimeout);
 				this.set('resolvePromise', resolve);
 				this.set('rejectPromise', reject);
 			});
-	},
+	}
 
 	async reset() {
 		this.removeAudioElement();
 
-		let audioTimeout = this.get('audioTimeout');
-		let rejectPromise = this.get('rejectPromise');
+		const audioTimeout = this.audioTimeout;
+		const rejectPromise = this.rejectPromise;
 
 		audioTimeout && cancel(audioTimeout);
 		rejectPromise && rejectPromise(new Error('Recorder Reset'));
 
 		this.resetRecorder();
-	},
+	}
 
 	async getAudio() {
-		let recorder = this.get('recorder');
+		const recorder = this.recorder;
 		if(!recorder) { throw new Error('Recorder not initialized'); }
 
 		await delayPromise(0);
 		const blob = this.recorderData;
-		let audioURL = crypto.createURL(blob);
-		let base64 = await crypto.fromBlob(blob, 'data');
+		const audioURL = crypto.createURL(blob);
+		const base64 = await crypto.fromBlob(blob, 'data');
 		return { blob, base64, audioURL };
-	},
+	}
 
 	removeAudioElement() {
-		let $audio = document.getElementById(this.audioElementID);
+		const $audio = document.getElementById(this.audioElementID);
 		if (!$audio) { return; }
 
 		$audio.removeEventListener('ended', this.removeAudioElement.bind(this));
 		$audio.parentElement.removeChild($audio);
-	},
+	}
 
 	resetRecorder() {
 		this.set('isRecording', false);
@@ -191,7 +201,7 @@ export default Service.extend({
 		this.set('rejectPromise', null);
 		this.set('resolvePromise', null);
 
-		let recorder = this.get('recorder');
+		const recorder = this.recorder;
 		recorder && recorder.stop();
 	}
-});
+}
