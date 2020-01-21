@@ -1,5 +1,3 @@
-import Recorder from 'opus-recorder';
-
 import { tracked } from '@glimmer/tracking';
 
 import { later, cancel } from '@ember/runloop';
@@ -40,7 +38,11 @@ function delayPromise(timeout) {
 }
 
 export default class RecorderService extends Service {
-	@service router;
+	@service 
+	router;
+
+	@service 
+	fastboot;
 
 	@tracked
 	recorder;
@@ -77,14 +79,22 @@ export default class RecorderService extends Service {
 		this.setup();
 	}
 
-	setup() {
-		const recorder = this.recorder || this.createNewRecorder();
+	async setup() {
+		if(this.fastboot.isFastBoot) { return; }
+
+		const recorder = this.recorder 
+			|| await this.createNewRecorder();
+
 		recorder.loadWorker();
 	}
 
-	createNewRecorder() {
+	async createNewRecorder() {
 		const numberOfChannels = this.numberOfChannels;
 		const encoderPath = `${this.router.rootURL}${this.encoderPath}`;
+
+		// Dynamic import so it does not run in fastboot
+		const Recorder = (await import('opus-recorder')).default;
+
 		const recorder = new Recorder({ 
 			encoderPath, 
 			numberOfChannels,

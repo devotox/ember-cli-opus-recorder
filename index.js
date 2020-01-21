@@ -6,18 +6,13 @@ const fastbootTransform = require('fastboot-transform');
 module.exports = {
 	name,
 	options: {
+		babel: {
+			plugins: [
+				'ember-auto-import/babel-plugin'
+			]
+		},
 		nodeAssets: {
 			'opus-recorder': {
-				vendor: {
-					srcDir: 'dist',
-					destDir: 'opus-recorder',
-					include: [
-						'recorder.min.js'
-					],
-					processTree(input) {
-						return fastbootTransform(input);
-					}
-				},
 				public: {
 					srcDir: 'dist',
 					destDir: 'opus-recorder',
@@ -34,15 +29,5 @@ module.exports = {
 				}
 			}
 		}
-	},
-
-	included() {
-		this._super.included.apply(this, arguments);
-
-		this.import('vendor/opus-recorder/recorder.min.js', {
-			using: [
-				{ transformation: 'amd', as: 'opus-recorder' }
-			]
-		});
 	}
 };
